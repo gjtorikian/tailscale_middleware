@@ -1,28 +1,123 @@
 # TailscaleMiddleware
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/tailscale_middleware`. To experiment with that code, run `bin/console` for an interactive prompt.
+`TailscaleMiddleware` provides support for protecting routes behind a [tailnet](https://tailscale.com/kb/1136/tailnet).
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Install the gem:
 
-Install the gem and add to the application's Gemfile by executing:
+`gem install tailscale_middleware`
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+Or in your Gemfile:
+
+```ruby
+gem 'tailscale_middleware'
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+## Configuration
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+### Rails Configuration
+
+For Rails, you'll need to add this middleware on application startup. A practical way to do this is with an initializer file, like this:
+
+```ruby
+# config/initializers/tailscale_middleware.rb
+
+Rails.application.config.middleware.insert_before 0, TailscaleMiddleware do
+  ...
+end
 ```
 
-## Usage
+Use `insert_before` to make sure `TailscaleMiddleware` runs at the beginning of the stack; this ensures it isn't interfered with by other middleware.
 
-TODO: Write usage instructions here
+See The [Rails Guide to Rack](http://guides.rubyonrails.org/rails_on_rack.html) for more details on Rack middleware. Read more about configuring middleware [in the Rails Guides](https://guides.rubyonrails.org/configuring.html#configuring-middleware)
+
+### Rack Configuration
+
+NOTE: If you're running Rails, adding a `config/initializers/tailscale_middleware.rb` should be enough.
+
+For pure Rack, in `config.ru`, configure `TailscaleMiddleware` by passing a block to the `use` command:
+
+```ruby
+use TailscaleMiddleware do
+  ...
+end
+```
+
+### Configuring for every path
+
+```ruby
+TailscaleMiddleware do
+  allow do
+    tailnet "rubber-duck"
+    path "*"
+  end
+end
+```
+
+In this example:
+
+1. If your server is not connected to a tailnet, the request is denied
+2. If your client is not connected to the `rubber-duck` tailnet, the request is denied
+3. If your client is connected to the `rubber-duck` tailnet, the request is passed along
+
+### Configuring for some paths
+
+```ruby
+TailscaleMiddleware do
+  allow do
+    tailnet "crab-cake"
+    path "/staff"
+  end
+end
+```
+
+In this example:
+
+1. If your server is not connected to a tailnet, the request is denied
+2. If your client is does not request anything under `/staff`, the request is passed along
+3. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
+4. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
+
+### Configuring for some paths
+
+```ruby
+TailscaleMiddleware do
+  allow do
+    tailnet "black-cat"
+    route "/secrets"
+  end
+
+  allow do
+    tailnet "crab-cake"
+    route "/staff"
+  end
+end
+```
+
+In this example:
+
+1. If your server is not connected to a tailnet, the request is denied
+2. If your client is does not request anything under `/secrets` or `/staff`, the request is passed along
+3. If your client requests something under `/secrets`, but is not connected to the `black-cat` tailnet, the request is denied
+4. If your client requests something under `/secrets`, and is connected to the `black-cat` tailnet, the request is passed along
+5. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
+6. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
+
+### Configuration Reference
+
+#### Middleware Options
+
+Pass the options along with the middleware, like:
+
+```
+Rails.application.config.middleware.insert_before 0, TailscaleMiddleware, debug: false, logger: (-> { Rails.logger }) do
+```
+
+| Option   | Type    | Default | Description                                                                                                                                                                                                                        |
+| -------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `debug`  | Boolean | `false` | Enables debug logging.                                                                                                                                                                                                             |
+| `logger` | Object  | `nil`   | Specify the logger to log to. If a proc is provided, it will be called when a logger is needed. This is helpful in cases where the logger is initialized after `TailscaleMiddleware` is initially configured, like `Rails.logger`. |
 
 ## Development
 
@@ -32,7 +127,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tailscale_middleware. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/tailscale_middleware/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/gjtorikian/tailscale_middleware. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/gjtorikian/tailscale_middleware/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -40,4 +135,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the TailscaleMiddleware project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/tailscale_middleware/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the TailscaleMiddleware project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/gjtorikian/tailscale_middleware/blob/main/CODE_OF_CONDUCT.md).

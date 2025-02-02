@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
-require "bundler/gem_tasks"
-require "minitest/test_task"
+if ENV.fetch("DEBUG", false)
+  require "awesome_print"
+  require "debug"
+end
 
-Minitest::TestTask.create
+# Gem Spec
+require "bundler"
+GEMSPEC = Bundler.load_gemspec("tailscale_middleware.gemspec")
 
-require "rubocop/rake_task"
-
-RuboCop::RakeTask.new
-
-task default: %i[test rubocop]
+# Packaging
+require "rubygems/package_task"
+gem_path = Gem::PackageTask.new(GEMSPEC).define
+desc "Package the Ruby gem"
+task "package" => [gem_path]

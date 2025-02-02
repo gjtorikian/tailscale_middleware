@@ -1,0 +1,10 @@
+require:
+  - rubocop-rails
+  - rubocop-rails-accessibility
+
+Rails/UnknownEnv:
+  Environments:
+    - development
+    - test
+    - staging
+    - production
