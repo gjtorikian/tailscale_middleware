@@ -8,6 +8,8 @@ class TestTailscaleMiddleware < Minitest::Test
   end
 
   def load_app(name, options: {})
+    Tsclient::ApiFinder.any_instance.stubs(:call).returns(URI.parse("http://localhost:61939/localapi"))
+
     Rack::Builder.new do
       eval(File.read(File.join(File.dirname(__FILE__), "fixtures", "#{name}.ru"))) # rubocop:disable Security/Eval
       map("/") do
