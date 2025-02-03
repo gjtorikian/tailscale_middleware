@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - "lib/tailscale_middleware/version.rb"
+      # - "lib/tailscale_middleware/version.rb"
   pull_request_target:
     types:
       - closed
