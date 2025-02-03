@@ -74,10 +74,9 @@ end
 
 In this example:
 
-1. If your server is not connected to a tailnet, the request is denied
-2. If your client is does not request anything under `/staff`, the request is passed along
-3. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
-4. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
+1. If your client is does not request anything under `/staff`, the request is passed along
+2. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
+3. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
 
 ### Configuring for some paths
 
@@ -97,27 +96,26 @@ end
 
 In this example:
 
-1. If your server is not connected to a tailnet, the request is denied
-2. If your client is does not request anything under `/secrets` or `/staff`, the request is passed along
-3. If your client requests something under `/secrets`, but is not connected to the `black-cat` tailnet, the request is denied
-4. If your client requests something under `/secrets`, and is connected to the `black-cat` tailnet, the request is passed along
-5. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
-6. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
+1. If your client is does not request anything under `/secrets` or `/staff`, the request is passed along
+2. If your client requests something under `/secrets`, but is not connected to the `black-cat` tailnet, the request is denied
+3. If your client requests something under `/secrets`, and is connected to the `black-cat` tailnet, the request is passed along
+4. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
+5. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
 
 ### Configuration Reference
 
 #### Middleware Options
 
-Pass the options along with the middleware, like:
-
-```
-Rails.application.config.middleware.insert_before 0, TailscaleMiddleware, debug: false, logger: (-> { Rails.logger }) do
-```
-
 | Option   | Type    | Default | Description                                                                                                                                                                                                                        |
 | -------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `debug`  | Boolean | `false` | Enables debug logging.                                                                                                                                                                                                             |
 | `logger` | Object  | `nil`   | Specify the logger to log to. If a proc is provided, it will be called when a logger is needed. This is helpful in cases where the logger is initialized after `TailscaleMiddleware` is initially configured, like `Rails.logger`. |
+
+Pass these options along with the middleware, like:
+
+```
+Rails.application.config.middleware.insert_before 0, TailscaleMiddleware, debug: false, logger: (-> { Rails.logger }) do
+```
 
 ## Development
 
