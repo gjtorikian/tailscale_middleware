@@ -44,13 +44,13 @@ use TailscaleMiddleware do
 end
 ```
 
-### Configuring for every path
+### Configuring for every route
 
 ```ruby
 TailscaleMiddleware do
   allow do
     tailnet "rubber-duck"
-    path "*"
+    route "*"
   end
 end
 ```
@@ -61,13 +61,13 @@ In this example:
 2. If your client is not connected to the `rubber-duck` tailnet, the request is denied
 3. If your client is connected to the `rubber-duck` tailnet, the request is passed along
 
-### Configuring for some paths
+### Configuring for some routes
 
 ```ruby
 TailscaleMiddleware do
   allow do
     tailnet "crab-cake"
-    path "/staff"
+    route "/staff"
   end
 end
 ```
@@ -78,7 +78,7 @@ In this example:
 2. If your client requests something under `/staff`, but is not connected to the `crab-cake` tailnet, the request is denied
 3. If your client requests something under `/staff`, and is connected to the `crab-cake` tailnet, the request is passed along
 
-### Configuring for some paths
+### Configuring for some routes
 
 ```ruby
 TailscaleMiddleware do
