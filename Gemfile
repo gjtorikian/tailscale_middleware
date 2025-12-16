@@ -16,7 +16,7 @@ end
 
 group :test do
   gem "minitest", "~> 5.6"
-  gem "mocha", "~> 2.7"
+  gem "mocha", "~> 3.0"
   gem "minitest-focus", "~> 1.1"
 
   gem "webmock", "~> 3.24"
