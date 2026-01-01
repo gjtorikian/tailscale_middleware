@@ -15,7 +15,7 @@ group :debug do
 end
 
 group :test do
-  gem "minitest", "~> 5.6"
+  gem "minitest", "~> 6.0"
   gem "mocha", "~> 3.0"
   gem "minitest-focus", "~> 1.1"
 
